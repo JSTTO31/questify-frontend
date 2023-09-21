@@ -4,6 +4,7 @@
     <div class="mt-9" style="padding-inline: 120px;" >
       <Container></Container>
     </div>
+    Example
   </v-container>
 </template>
 
