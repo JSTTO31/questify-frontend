@@ -45,7 +45,8 @@ export default () => {
       answer_keys: [],
       shuffle: false,
       type,
-      answers: []
+      answers: [],
+      group: null
     }
 
     questionnaire.value.questions.push(question)
@@ -88,6 +89,7 @@ export default () => {
       question.answer_keys = data.answer_keys
       question.shuffle = data.shuffle
       question.points = data.points
+      question.group = data.group
       $questionnaire.$patch({
         //@ts-ignore
             trigger: 'update question',
@@ -97,6 +99,20 @@ export default () => {
             },
       })
     }
+  }
+
+  const remove_group = (group_name: string) => {
+    questionnaire.value.questions = questionnaire.value.questions.map(item => ({...item, group: item.group == group_name ? null : item.group}))
+
+    $questionnaire.$patch({
+      //@ts-ignore
+          trigger: 'remove group',
+          data: {
+            group_name,
+            questionnaire: questionnaire.value
+          },
+    })
+
   }
 
   const add_answer = (external: Question) => {
@@ -162,5 +178,5 @@ export default () => {
 
 
 
-  return {add_question, remove_question, types, selectedQuestion, getCurrentIcon, update_question, add_answer,remove_answer, update_answer}
+  return {add_question, remove_question, types, selectedQuestion, getCurrentIcon, update_question, add_answer,remove_answer, update_answer, remove_group}
 }

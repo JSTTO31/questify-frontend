@@ -20,6 +20,7 @@ export interface Question{
   points: number;
   answer_keys: string[]
   shuffle: boolean
+  group: string | null;
   created_at?: string;
   updated_at?: string;
 }
@@ -107,6 +108,15 @@ export const useQuestionnaireStore = defineStore('questionnaire', {
       } catch (error) {
         console.log(error);
 
+      }
+    },
+    async remove_group(group_name: string){
+      try {
+        const response = await api.put(`/questionnaire/${this.questionnaire.id}/questions/remove-group`, {group_name})
+
+        return response
+      } catch (error) {
+        console.log(error);
       }
     },
     async add_answer(question_index: number, answer: Answer){

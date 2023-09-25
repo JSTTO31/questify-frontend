@@ -37,7 +37,7 @@ import {useQuestionnaireStore } from '@/store/questionnaire';
 import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
 import { onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { onBeforeRouteLeave, useRouter } from 'vue-router';
 const {questionnaire} = storeToRefs(useQuestionnaireStore())
 const $questionnaire = useQuestionnaireStore()
 const copied = ref(false)
@@ -113,8 +113,33 @@ $questionnaire.$subscribe((mutation, state) => {
       $questionnaire.update_answer(question.index, answer)
     }
 
+    //@ts-ignore
+    if(mutation.payload.trigger == 'remove group'){
+      //@ts-ignore
+      const group_name = mutation.payload.data.group_name;
+      //@ts-ignore
+      $questionnaire.remove_group(group_name)
+    }
+
+
+
     localStorage.setItem('questionnaire', JSON.stringify(questionnaire.value))
   }
+})
+
+const contextmenufn = (e: any) => {
+  e.preventDefault()
+}
+
+
+window.addEventListener('contextmenu', contextmenufn)
+
+
+onBeforeRouteLeave((to, from, next) => {
+  removeEventListener('contextmenu',contextmenufn)
+
+
+  next()
 })
 
 </script>

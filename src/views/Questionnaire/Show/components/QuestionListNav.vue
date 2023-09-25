@@ -1,36 +1,143 @@
 <template>
-  <v-navigation-drawer width="300">
-    <v-layout class="w-100 h-100" >
-      <v-app-bar flat class="border-b" color="grey-lighten-5" density="compact">
+  <v-navigation-drawer width="310">
+    <v-layout class="w-100 h-100">
+      <v-app-bar flat class="border-b" app color="grey-lighten-5" density="compact">
         <v-app-bar-title class="text-subtitle-1">Question List</v-app-bar-title>
       </v-app-bar>
       <v-main class="h-100" >
-        <v-list class="pa-0 h-100" style="overflow-y: auto;">
-          <v-hover v-slot="{isHovering, props}" v-for="(question, n) in questionnaire.questions" :key="question.random_id">
-            <v-list-item v-bind="props" color="#FF9B82"  :title="question.text" class="text-center" @click="selectedQuestion = question"  :active="selectedQuestion.index == question.index">
-            <template #prepend>{{ n + 1}}.</template>
-            <template #append>
-              <v-btn style="position: absolute;right: -17%;" class="mr-15" size="small" variant="text" color="error" v-if="isHovering" icon="mdi-trash-can-outline" @click="remove_question(question)"></v-btn>
-            </template>
-          </v-list-item>
-          </v-hover>
+        <v-list class="pa-0 h-100" id="list" style="overflow-y: auto;" @dragover.prevent="isDragover = true
+" @drop.prevent="drop" @dragleave.prevent="isDragover = false" :class="isDragover ? 'bg-grey-lighten-2' : ''">
+          <div
+            v-for="(question, n) in questions" :key="question.random_id"
+
+          >
+              <QuestionListItem @contextmenu="($event: any) => showMenu($event, question)" :question="question" :index="n" :selected-menu-dialog="selected" v-if="!question.is_group"></QuestionListItem>
+              <QuestionListGroup :question="question" :selected-menu-dialog="selected" :index="n" @right-click="showMenu" v-else></QuestionListGroup>
+          </div>
         </v-list>
       </v-main>
       <v-footer app class="pa-0" color="transparent">
         <v-btn @click="add_question('multiple')" class="rounded-0" color="primary" prepend-icon="mdi-plus" block>Add Question</v-btn>
       </v-footer>
+      <MenuDialog
+        v-model:show="showMenuDialog"
+        v-model:selected-question="selected"
+        ></MenuDialog>
     </v-layout>
   </v-navigation-drawer>
 </template>
 
 <script setup lang="ts">
+import QuestionListGroup from './QuestionListGroup.vue';
+import QuestionListItem from './QuestionListItem.vue';
+import MenuDialog from './MenuDialog.vue';
 import useQuestionnaire from '@/composables/useQuestionnaire';
-import { useQuestionnaireStore } from '@/store/questionnaire';
+import { Question, useQuestionnaireStore } from '@/store/questionnaire';
 import { storeToRefs } from 'pinia';
-const {add_question, remove_question} = useQuestionnaire()
-const {questionnaire, selectedQuestion} = storeToRefs(useQuestionnaireStore())
+import {ref, computed} from 'vue'
+import { onBeforeRouteLeave } from 'vue-router';
+const {add_question, update_question} = useQuestionnaire()
+const {questionnaire} = storeToRefs(useQuestionnaireStore())
+const selected = ref({} as Question)
+const showMenuDialog = ref(false)
+const outside = ref(false)
+const questions = computed(() => {
+  const groups : any = [];
+  const noGroup : any = []
+  questionnaire.value.questions.forEach((question, index) => {
+    if(!question.group){
+      noGroup.push(questionnaire.value.questions[index])
+    }else{
+      const group_name = questionnaire.value.questions[index].group
+      const group = groups.find((item: any) => item.group_name == group_name)
+      if(group){
+        group.questions.push(questionnaire.value.questions[index])
+      }else{
+        groups.push({
+          group_name,
+          index: questionnaire.value.questions[index].index,
+          questions: [questionnaire.value.questions[index]],
+          is_group: true
+        })
+      }
+    }
+  })
+  //@ts-ignore
+  return noGroup.concat(groups).sort((a,b) => {
+    return a.index - b.index
+  })
+})
+const isDragover = ref(false)
+const showMenu = (e: Event, question: Question) => {
+  e.preventDefault()
+  showMenuDialog.value = true
+  outside.value = false
+  selected.value = question
+}
+
+const drop = (e: Event) => {
+  e.preventDefault()
+  isDragover.value = false
+  //@ts-ignore
+  let index = e.dataTransfer.getData("question_index")
+  //@ts-ignore
+  let is_child = e.dataTransfer.getData("is_child")
+  let question = questionnaire.value.questions.find(item => item.index == index)
+
+  if(question && is_child){
+    update_question(index, {...question, group: ''})
+  }
+
+}
+
+const contextmenuFn = (e: any) => {
+  e.preventDefault()
+  if(!outside.value){
+    outside.value = true
+  }else{
+    selected.value = {} as Question
+  }
+
+  const card = document.getElementById('card')
+
+  if(card){
+    if(screen.height <= (e.y + card.clientHeight) + 100){
+      card.style.top = (e.y - card.clientHeight) + 'px';
+      card.style.left = e.x + 'px';
+    }else{
+      card.style.top = e.y + 'px';
+      card.style.left = e.x + 'px';
+    }
+  }
+}
+
+window.addEventListener('contextmenu', contextmenuFn)
+
+onBeforeRouteLeave((to, from, next) => {
+  removeEventListener('contextmenu', contextmenuFn)
+  next()
+})
+
 </script>
 
 <style scoped>
 
+#list{
+  transition: all .2s linear;
+}
+
+#list:hover::-webkit-scrollbar-thumb{
+  background-color: rgb(165, 165, 165);
+
+}
+
+
+#list::-webkit-scrollbar{
+  width: 7px;
+}
+
+#list::-webkit-scrollbar-thumb{
+  background-color: #ffffff;
+  border-radius: 50px;
+}
 </style>
