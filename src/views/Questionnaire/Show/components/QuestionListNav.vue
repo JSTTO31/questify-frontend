@@ -5,14 +5,22 @@
         <v-app-bar-title class="text-subtitle-1">Question List</v-app-bar-title>
       </v-app-bar>
       <v-main class="h-100" >
-        <v-list class="pa-0 h-100" id="list" style="overflow-y: auto;" @dragover.prevent="isDragover = true
-" @drop.prevent="drop" @dragleave.prevent="isDragover = false" :class="isDragover ? 'bg-grey-lighten-2' : ''">
+        <v-list class="pa-0 h-100" ref="parentList" id="list" style="overflow-y: auto;" @dragover.prevent="isDragover = true
+"         @drop.prevent="drop" @dragleave.prevent="isDragover = false" :class="isDragover ? 'bg-grey-lighten-2' : ''"       @click="selected = []">
           <div
-            v-for="(question, n) in questions" :key="question.random_id"
-
+            v-for="(question, n) in questions" :key="question"
           >
-              <QuestionListItem @contextmenu="($event: any) => showMenu($event, question)" :question="question" :index="n" :selected-menu-dialog="selected" v-if="!question.is_group"></QuestionListItem>
-              <QuestionListGroup :question="question" :selected-menu-dialog="selected" :index="n" @right-click="showMenu" v-else></QuestionListGroup>
+              <QuestionListItem
+                @contextmenu="($event: any) => showMenu($event, question)"
+                :question="question" :index="n"
+                v-model:selected-menu-dialog="selected"
+                v-model:showMenuDialog="showMenuDialog"
+                v-if="!question.is_group"></QuestionListItem>
+              <QuestionListGroup
+                :question="question"
+                v-model:selected-menu-dialog="selected" :index="n"
+                v-model:show-menu-dialog="showMenuDialog"
+                @right-click="showMenu" v-else></QuestionListGroup>
           </div>
         </v-list>
       </v-main>
@@ -21,7 +29,7 @@
       </v-footer>
       <MenuDialog
         v-model:show="showMenuDialog"
-        v-model:selected-question="selected"
+        v-model:selected-questions="selected"
         ></MenuDialog>
     </v-layout>
   </v-navigation-drawer>
@@ -36,9 +44,10 @@ import { Question, useQuestionnaireStore } from '@/store/questionnaire';
 import { storeToRefs } from 'pinia';
 import {ref, computed} from 'vue'
 import { onBeforeRouteLeave } from 'vue-router';
-const {add_question, update_question} = useQuestionnaire()
+const parentList = ref(null)
+const {add_question, update_question, update_questions} = useQuestionnaire()
 const {questionnaire} = storeToRefs(useQuestionnaireStore())
-const selected = ref({} as Question)
+const selected = ref([] as Question[])
 const showMenuDialog = ref(false)
 const outside = ref(false)
 const questions = computed(() => {
@@ -63,16 +72,27 @@ const questions = computed(() => {
     }
   })
   //@ts-ignore
-  return noGroup.concat(groups).sort((a,b) => {
+  return groups.sort((a,b) => {
+    return a.group_name.localeCompare(b.group_name)
+  }).concat(noGroup.sort((a: any,b: any) => {
     return a.index - b.index
-  })
+
+  }))
 })
+
 const isDragover = ref(false)
+
 const showMenu = (e: Event, question: Question) => {
   e.preventDefault()
   showMenuDialog.value = true
   outside.value = false
-  selected.value = question
+  const isSelected = selected.value.some(item => item.index == question.index)
+  //@ts-ignore
+  if(isSelected){
+    return
+  }else{
+    selected.value = [question]
+  }
 }
 
 const drop = (e: Event) => {
@@ -85,7 +105,13 @@ const drop = (e: Event) => {
   let question = questionnaire.value.questions.find(item => item.index == index)
 
   if(question && is_child){
-    update_question(index, {...question, group: ''})
+    if(selected.value.length > 0){
+      let questions = selected.value.map(item => ({...item, group: ''}))
+      update_questions(questions)
+      selected.value = []
+    }else{
+      update_question(index, {...question, group: ''})
+    }
   }
 
 }
@@ -95,7 +121,7 @@ const contextmenuFn = (e: any) => {
   if(!outside.value){
     outside.value = true
   }else{
-    selected.value = {} as Question
+    selected.value = []
   }
 
   const card = document.getElementById('card')
@@ -111,10 +137,27 @@ const contextmenuFn = (e: any) => {
   }
 }
 
+const selectAll = (e: Event) => {
+  //@ts-ignore
+  if(e.ctrlKey && e.key == 'a' && selected.value.length > 0){
+    selected.value = questionnaire.value.questions
+  }
+
+
+}
+
+const windowClick = (e: Event) => {
+  selected.value = []
+}
+
 window.addEventListener('contextmenu', contextmenuFn)
+window.addEventListener('click', windowClick)
+window.addEventListener('keyup', selectAll)
 
 onBeforeRouteLeave((to, from, next) => {
   removeEventListener('contextmenu', contextmenuFn)
+  removeEventListener('click', windowClick)
+  removeEventListener('keyup', selectAll)
   next()
 })
 

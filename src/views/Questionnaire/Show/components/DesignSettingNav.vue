@@ -1,6 +1,6 @@
 <template>
   <v-navigation-drawer location="right" :key="selectedQuestion.random_id" :model-value="Object.keys(selectedQuestion).length > 0" width="300">
-    <div class="pa-5 h-100" style="overflow-y: auto;">
+    <div class="pa-5 h-100" style="overflow-y: auto;" id="design-container">
       <h3 class="mb-3">Settings</h3>
       <div>
         <h4 class="mb-2 font-weight-regular">Variants</h4>
@@ -33,9 +33,6 @@
             </v-list>
           </v-card>
         </v-menu>
-
-
-
         <h4 class="mb-2 font-weight-regular">Shuffle</h4>
         <v-switch :model-value="selectedQuestion.shuffle" density="compact" color="primary" inset @change="($event: any) =>
         //@ts-ignore
@@ -80,5 +77,22 @@ watchEffect(() => {
 </script>
 
 <style scoped>
+#design-container{
+  transition: all .2s linear;
+}
 
+#design-container:hover::-webkit-scrollbar-thumb{
+  background-color: rgb(165, 165, 165);
+
+}
+
+
+#design-container::-webkit-scrollbar{
+  width: 7px;
+}
+
+#design-container::-webkit-scrollbar-thumb{
+  background-color: #ffffff;
+  border-radius: 50px;
+}
 </style>

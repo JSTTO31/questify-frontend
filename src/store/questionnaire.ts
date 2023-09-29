@@ -100,6 +100,15 @@ export const useQuestionnaireStore = defineStore('questionnaire', {
 
       }
     },
+    async update_questions(questions: [Question]){
+      try {
+        const response = await api.put(`/questionnaire/${this.questionnaire.id}/questions/update`, {questions})
+        return response
+      } catch (error) {
+        console.log(error);
+
+      }
+    },
     async remove_question(question_index: number){
       try {
         const response = await api.delete(`/questionnaire/${this.questionnaire.id}/questions/` + question_index)
@@ -110,10 +119,27 @@ export const useQuestionnaireStore = defineStore('questionnaire', {
 
       }
     },
+    async remove_questions(questions: Question[]){
+      try {
+        const response = await api.put(`/questionnaire/${this.questionnaire.id}/questions/remove`, {questions})
+
+        return response
+      } catch (error) {
+        console.log(error);
+
+      }
+    },
+    async group(group_name: string, questions: Question[]){
+      try {
+        const response = await api.put(`/questionnaire/${this.questionnaire.id}/questions/group`, {group: group_name, questions})
+        return response
+      } catch (error) {
+        console.log(error);
+      }
+    },
     async remove_group(group_name: string){
       try {
         const response = await api.put(`/questionnaire/${this.questionnaire.id}/questions/remove-group`, {group_name})
-
         return response
       } catch (error) {
         console.log(error);

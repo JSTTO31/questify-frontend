@@ -1,7 +1,7 @@
 <template>
   <v-container :fluid="name != 'xxl'" class="pt-0">
     <v-card class="px-2 py-5 mb-2" >
-      <v-textarea auto-grow rows="1" hide-details label="Question" class="font-weight-medium" single-line variant="solo" flat :model-value="selectedQuestion.text" @change="($event: any) => update_question(
+      <v-textarea id="question-text" @focus="selectAllText" auto-grow rows="1" hide-details label="Question" class="font-weight-medium" variant="solo" flat :model-value="selectedQuestion.text" @change="($event: any) => update_question(
         //@ts-ignore
         selectedQuestion.index,
         {...selectedQuestion, text: $event.target.value})
@@ -28,7 +28,6 @@
       </v-card-actions>
     </v-card>
   </v-container>
-
 </template>
 
 <script setup lang="ts">
@@ -39,7 +38,10 @@ import { useDisplay } from 'vuetify/lib/framework.mjs';
 const {name} = useDisplay()
 const {selectedQuestion} = storeToRefs(useQuestionnaireStore())
 const {update_question, add_answer, remove_answer, getCurrentIcon, update_answer} = useQuestionnaire()
-
+const selectAllText = (e: Event) => {
+  //@ts-ignore
+  document.getElementById('question-text').select()
+}
 </script>
 
 <style scoped>

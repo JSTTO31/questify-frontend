@@ -1,5 +1,7 @@
 <template>
   <div>
+    <h1 class="mb-10 text-center">{{ question.text }}</h1>
+
     <v-card @click="selectAnswer(
         //@ts-ignore
         question.id, answer.index)"

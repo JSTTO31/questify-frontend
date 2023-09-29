@@ -1,5 +1,7 @@
 <template>
   <div class="rounded-lg">
+    <h1 class="mb-10 text-center">{{ question.text }}</h1>
+
     <v-text-field variant="solo" class="text-field" flat single-line rows="15" @change="select" no-resize density="comfortable" hide-details label="Text"></v-text-field>
   </div>
 </template>

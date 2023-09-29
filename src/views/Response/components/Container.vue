@@ -4,6 +4,7 @@
 
 <script setup lang="ts">
 import {shallowRef} from 'vue'
+import DragAndDrop from './DragAndDrop.vue';
 import Select from './Select.vue';
 import Paragraph from './Paragraph.vue'
 import MultipleChoices from './MultipleChoices.vue';
@@ -13,6 +14,10 @@ import { storeToRefs } from 'pinia';
 import { useRespondentStore } from '@/store/respondent';
 const component = shallowRef(MultipleChoices)
 const {question} = storeToRefs(useRespondentStore())
+
+if(question.value.type == 'drag'){
+  component.value = DragAndDrop
+}
 
 if(question.value.type == 'check'){
   component.value = Checkboxes

@@ -1,4 +1,6 @@
 <template>
+  <h1 class="mb-10 text-center">{{ question.text }}</h1>
+
   <v-card class="text-h1">
     <v-select hide-details density="comfortable" single-line label="Select Answer" @update:model-value="select" :items="question.answers" :model-value="currentAnswer[0]" item-title="text" item-value="index"></v-select>
   </v-card>

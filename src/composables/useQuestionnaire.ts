@@ -31,6 +31,11 @@ export default () => {
       value: 'paragraph',
       icon: 'mdi-text-long',
     },
+    {
+      label: 'Drag and Drop',
+      value: 'drag',
+      icon: 'mdi-drag',
+    },
   ]
   const {questionnaire, selectedQuestion} = storeToRefs(useQuestionnaireStore())
   const getCurrentIcon = (value: string) => types.find(item => item.value == value)?.icon
@@ -75,11 +80,28 @@ export default () => {
             },
       })
 
-    if(selectedQuestion.value.index == question.index){
+      if(selectedQuestion.value.index == question.index){
+        selectedQuestion.value = {} as Question
+      }
+
+  }
+
+  const remove_questions = (questions: Question[]) => {
+    questionnaire.value.questions = questionnaire.value.questions.filter(item => !questions.some(innerItem => innerItem.index == item.index))
+    $questionnaire.$patch({
+      //@ts-ignore
+            trigger: 'remove questions',
+            data: {
+              questions: questions,
+              questionnaire: questionnaire.value
+            },
+      })
+
+    if(questions.some(item => item.index == selectedQuestion.value.index)){
       selectedQuestion.value = {} as Question
     }
 
-    }
+  }
 
   const update_question = (question_index: number, data: Question) => {
     const question = questionnaire.value.questions.find(item => item.index == question_index)
@@ -99,6 +121,27 @@ export default () => {
             },
       })
     }
+  }
+
+  const update_questions = (questions: Question[]) => {
+    questionnaire.value.questions = questionnaire.value.questions.map(item => {
+      const question = questions.find(innerItem => innerItem.index == item.index)
+
+      if(question){
+        return question
+      }
+
+      return item;
+    })
+
+    $questionnaire.$patch({
+      //@ts-ignore
+          trigger: 'update questions',
+          data: {
+            questions,
+            questionnaire: questionnaire.value
+          },
+    })
   }
 
   const remove_group = (group_name: string) => {
@@ -171,12 +214,23 @@ export default () => {
         },
       })
     }
+  }
 
+  const group_questions = (questions: Question[], group_name: string) => {
+    questionnaire.value.questions = questionnaire.value.questions.map(item => questions.some(innerItem => innerItem.index == item.index) ?  ({...item, group: group_name}) : item)
 
-
+    $questionnaire.$patch({
+       //@ts-ignore
+       trigger: 'group',
+       data: {
+         questions,
+         group_name,
+         questionnaire: questionnaire.value,
+       },
+    })
   }
 
 
 
-  return {add_question, remove_question, types, selectedQuestion, getCurrentIcon, update_question, add_answer,remove_answer, update_answer, remove_group}
+  return {add_question, remove_question, types, selectedQuestion, getCurrentIcon, update_question, add_answer,remove_answer, update_answer, remove_group, group_questions, remove_questions, update_questions}
 }

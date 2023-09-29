@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-grey-lighten-4 h-100 w-100 "  fluid>
+  <div class="bg-grey-lighten-4 h-100 w-100 "  fluid style="user-select: none;">
     <v-app-bar flat height="100" class="pr-5" color="#57375D">
       <v-app-bar-nav-icon icon="mdi-arrow-left" @click="$router.push('/')"></v-app-bar-nav-icon>
       <h1 class="font-weight-regular ml-5">{{ questionnaire.title }}</h1>
@@ -80,10 +80,24 @@ $questionnaire.$subscribe((mutation, state) => {
     }
 
     //@ts-ignore
+    if(mutation.payload.trigger == 'remove questions'){
+      //@ts-ignore
+      const questions = mutation.payload.data.questions;
+      $questionnaire.remove_questions(questions)
+    }
+
+    //@ts-ignore
     if(mutation.payload.trigger == 'update question'){
       //@ts-ignore
       const question = mutation.payload.data.question;
       $questionnaire.update_question(question)
+    }
+
+    //@ts-ignore
+    if(mutation.payload.trigger == 'update questions'){
+      //@ts-ignore
+      const questions = mutation.payload.data.questions;
+      $questionnaire.update_questions(questions)
     }
 
     //@ts-ignore
@@ -121,7 +135,15 @@ $questionnaire.$subscribe((mutation, state) => {
       $questionnaire.remove_group(group_name)
     }
 
-
+    //@ts-ignore
+    if(mutation.payload.trigger == 'group'){
+      //@ts-ignore
+      const group_name = mutation.payload.data.group_name;
+      //@ts-ignore
+      const questions = mutation.payload.data.questions;
+      //@ts-ignore
+      $questionnaire.group(group_name, questions)
+    }
 
     localStorage.setItem('questionnaire', JSON.stringify(questionnaire.value))
   }

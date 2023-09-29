@@ -1,10 +1,8 @@
 <template>
   <v-container>
-    <h1 class="text-center font-weight-medium text-white">{{ question.text }}</h1>
-    <div class="mt-9" style="padding-inline: 120px;" >
+    <div class="mt-9 text-white">
       <Container></Container>
     </div>
-    Example
   </v-container>
 </template>
 
