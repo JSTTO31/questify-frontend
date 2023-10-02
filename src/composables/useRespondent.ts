@@ -8,6 +8,7 @@ import { useRouter } from "vue-router"
 
 export default () => {
   const router = useRouter()
+  const showSubmit = ref(false)
   const loading = ref(false)
   const $respondent = useRespondentStore()
   const {questionnaire, question, response, hasResponseIdentity}  = storeToRefs(useRespondentStore())
@@ -66,16 +67,11 @@ export default () => {
 
   const currentIndex = computed(() => questionnaire.value.questions.findIndex( item => item.id == question.value.id))
 
-  const selectAnswer = (question_id: number, answer_index: number) => {
+  const selectAnswer = (question_id: number, answer: string) => {
     const question = response.value.question_responses.find(item=> question_id == item.question_id)
     //@ts-ignore
     if(question){
-      const exists = question.answer_keys.some(item => item == answer_index)
-      if(exists){
-        question.answer_keys = question.answer_keys.filter(item => item != answer_index)
-        return
-      }
-      question.answer_keys.push(answer_index);
+      question.answer_keys.push(answer);
     }
   }
 
@@ -92,6 +88,7 @@ export default () => {
     $respondent.submitResponse().then(() => {
       router.push({name: 'response.success', params: {questionnaire_id: questionnaire.value.id}})
       loading.value = false
+      showSubmit.value = false
     })
 
   }
@@ -104,8 +101,8 @@ export default () => {
 
   const currentAnswer : any = computed(() => response.value.question_responses.find(item => item.question_id == question.value.id)?.answer_keys)
 
-  const isSelected = computed(() => (answer: Answer) => currentAnswer.value.length > 0 && currentAnswer.value.some((item: any) => item == answer.index) ? true : false)
+  const isSelected = computed(() => (answer: Answer) => currentAnswer.value.length > 0 && currentAnswer.value.some((item: any) => item == answer.text) ? true : false)
 
 
-  return {links, first_question, last_question, timer, clock, currentIndex, selectAnswer, currentAnswer, currentResponseQuestion, submit, review, loading, clearAnswer, isSelected}
+  return {links, first_question, last_question, timer, clock, currentIndex, selectAnswer, currentAnswer, currentResponseQuestion, submit, review, loading, clearAnswer, isSelected, showSubmit}
 }

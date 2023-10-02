@@ -14,8 +14,10 @@ import { storeToRefs } from 'pinia';
 const {response, } = storeToRefs(useRespondentStore())
 const question_response = response.value.question_responses.find(item => item.question_id == props.question.id)
 const props = defineProps<{question: Question, index: number}>()
-const icon = question_response?.marked ? 'mdi-lightbulb' : !question_response?.answer_id ? 'mdi-reload' : 'mdi-check'
-const color = question_response?.marked ? 'warning' : !question_response?.answer_id ? 'grey' : 'success'
+//@ts-ignore
+const icon = question_response?.marked ? 'mdi-lightbulb' : question_response.answer_keys.length < 1 ? 'mdi-reload' : 'mdi-check'
+//@ts-ignore
+const color = question_response?.marked ? 'warning' : question_response.answer_keys.length < 1? 'grey' : 'success'
 </script>
 
 <style scoped>

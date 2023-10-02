@@ -19,7 +19,7 @@
       <v-icon>mdi-timer</v-icon>
         Timer {{ timer }}
     </v-app-bar>
-    <v-main class="d-flex align-center justify-center" style="background-color: #57375D;padding-inline: 350px;">
+    <v-main class="d-flex align-center justify-center" style="background-color: #57375D;padding-inline: 250px;">
         <RouterView v-slot="{Component}">
           <Transition :name="$route.meta.transition?.toString() || 'slide'" mode="out-in">
               <component :key="question" :is="Component"></component>
@@ -40,7 +40,8 @@
       </v-btn>
     </span>
     <v-footer app color="transparent" class="pa-5"></v-footer>
-    <div v-if="$route.name == 'response.question'" class="d-flex pb-5" style="padding-inline: 485px;position: fixed;bottom: 0;left: 0;width: 100%;z-index: 50000;">
+    <!-- Submit, Review and Next button -->
+    <div v-if="$route.name == 'response.question'" class="d-flex pb-5" style="padding-inline: 265px;position: fixed;bottom: 0;left: 0;width: 100%;z-index: 50000;">
       <v-spacer></v-spacer>
       <v-btn append-icon="mdi-arrow-right" :disabled="!links.nextQuestion" @click="$router.push({name: 'response.question', params: {question_id: links.nextQuestion.id}})" size="x-large" color="primary" v-if="currentResponseQuestion && currentResponseQuestion.answer_keys.length > 0 && last_question.id != question.id && !response.reviewed">Next Question</v-btn>
       <div class="d-flex" >
@@ -48,6 +49,7 @@
         <v-btn color="secondary" size="x-large" class="ml-4" @click="review" v-if="last_question.id == question.id || response.reviewed">Review</v-btn>
       </div>
     </div>
+    <!-- Submit Confirmation Dialog  -->
     <v-dialog v-model="showSubmit" width="700" style="z-index: 500000">
       <v-card class="d-flex flex-column justify-center align-center pa-15 rounded-xl" >
         <v-avatar class="rounded-0" size="180">
@@ -73,12 +75,11 @@ import { storeToRefs } from 'pinia';
 import { onMounted } from 'vue';
 import { ref, provide } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-const showSubmit = ref(false)
 const router = useRouter()
 const $respondent = useRespondentStore()
 const showQuestionList = ref(false)
-const {question, questionnaire, response} = storeToRefs(useRespondentStore())
-const { timer, clock, currentIndex, currentResponseQuestion, links, last_question, submit, review } = useRespondent()
+const {question, questionnaire, response, times_up} = storeToRefs(useRespondentStore())
+const { timer, clock, currentIndex, currentResponseQuestion, links, last_question, submit, review, showSubmit } = useRespondent()
 const route = useRoute()
 provide('timer', timer)
 
@@ -94,14 +95,12 @@ onMounted(() => {
         })
       }
 
-      $respondent.getQuestionnaireWithAnswerKeys(questionnaire.value.id)
-
+      times_up.value = true
       clearInterval(interval)
     }
   }, 1000)
 
 })
-
 
 $respondent.$subscribe(() => {
   localStorage.setItem('response', JSON.stringify(response.value))

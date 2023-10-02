@@ -1,8 +1,7 @@
 <template>
   <div class="rounded-lg">
     <h1 class="mb-10 text-center">{{ question.text }}</h1>
-
-    <v-text-field variant="solo" class="text-field" flat single-line rows="15" @change="select" no-resize density="comfortable" hide-details label="Text"></v-text-field>
+    <v-text-field :model-value="currentAnswer[0] || ''" variant="solo" class="text-field" flat single-line rows="15" @change="select" no-resize density="comfortable" hide-details label="Text"></v-text-field>
   </div>
 </template>
 <script setup lang="ts">
@@ -15,8 +14,13 @@ const select = (e: any) => {
   if(Object.keys(question).length > 0){
     //@ts-ignore
     clearAnswer(question.value.id)
-    //@ts-ignore
-    selectAnswer(question.value.id, e.target.value)
+
+    if(!e.target.value){
+      return;
+    }else{
+      //@ts-ignore
+      selectAnswer(question.value.id, e.target.value)
+    }
   }
 }
 </script>

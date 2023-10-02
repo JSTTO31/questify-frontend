@@ -19,7 +19,7 @@ export interface Question{
   answers: Answer[];
   points: number;
   answer_keys: string[]
-  shuffle: boolean
+  auto_check: boolean
   group: string | null;
   created_at?: string;
   updated_at?: string;

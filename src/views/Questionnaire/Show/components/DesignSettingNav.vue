@@ -33,10 +33,10 @@
             </v-list>
           </v-card>
         </v-menu>
-        <h4 class="mb-2 font-weight-regular">Shuffle</h4>
-        <v-switch :model-value="selectedQuestion.shuffle" density="compact" color="primary" inset @change="($event: any) =>
+        <h4 class="mb-2 font-weight-regular">Auto Check</h4>
+        <v-switch :model-value="selectedQuestion.auto_check" density="compact" color="primary" inset @change="($event: any) =>
         //@ts-ignore
-        update_question(selectedQuestion.index, {...selectedQuestion, shuffle: $event.target.checked})
+        update_question(selectedQuestion.index, {...selectedQuestion, auto_check: $event.target.checked})
         "></v-switch>
       </div>
     </div>

@@ -48,7 +48,7 @@ export default () => {
       text: 'Question',
       points: 1,
       answer_keys: [],
-      shuffle: false,
+      auto_check: false,
       type,
       answers: [],
       group: null
@@ -104,12 +104,13 @@ export default () => {
   }
 
   const update_question = (question_index: number, data: Question) => {
+
     const question = questionnaire.value.questions.find(item => item.index == question_index)
     if(question){
       question.text = data.text
       question.type = data.type
       question.answer_keys = data.answer_keys
-      question.shuffle = data.shuffle
+      question.auto_check = data.auto_check
       question.points = data.points
       question.group = data.group
       $questionnaire.$patch({

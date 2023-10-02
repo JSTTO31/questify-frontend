@@ -3,7 +3,7 @@
     <h1 class="mb-10 text-center">{{ question.text }}</h1>
     <v-card @click="select(
         //@ts-ignore
-        question.id, answer.index)"
+        question.id, answer.text)"
         class="d-flex align-center  my-5 pa-2 font-weight-medium"
         v-for="answer in question.answers"
         :key="answer.id"
@@ -26,9 +26,9 @@ import useRespondent from '../../../composables/useRespondent'
 import { storeToRefs } from 'pinia';
 const {question } = storeToRefs(useRespondentStore())
 const {selectAnswer, currentAnswer, clearAnswer, isSelected} = useRespondent()
-const select = (question_id: number, answer_index: number) => {
+const select = (question_id: number, answer: string) => {
   clearAnswer(question_id)
-  selectAnswer(question_id, answer_index)
+  selectAnswer(question_id, answer)
 }
 </script>
 

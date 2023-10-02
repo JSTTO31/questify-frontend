@@ -169,18 +169,18 @@ onBeforeRouteLeave((to, from, next) => {
   transition: all .2s linear;
 }
 
-#list:hover::-webkit-scrollbar-thumb{
-  background-color: rgb(165, 165, 165);
+#list:hover::-webkit-scrollbar{
+  width: 7px;
 
 }
 
 
 #list::-webkit-scrollbar{
-  width: 7px;
+  width: 0px;
 }
 
 #list::-webkit-scrollbar-thumb{
-  background-color: #ffffff;
+  background-color: rgb(165, 165, 165);;
   border-radius: 50px;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container style="user-select: none;">
     <div class="mt-9 text-white">
       <Container></Container>
     </div>

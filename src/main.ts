@@ -7,11 +7,14 @@ import { createApp } from 'vue'
 import { registerPlugins } from '@/plugins'
 import { useUserStore } from './store/user'
 import 'nprogress/nprogress.css';
+import { api } from './composables/useUtilities';
 const app = createApp({
   ...App,
   mounted(){
+
     const $user = useUserStore()
     $user.setUser()
+
   }
 })
 

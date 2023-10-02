@@ -1,10 +1,9 @@
 <template>
   <div>
     <h1 class="mb-10 text-center">{{ question.text }}</h1>
-
     <v-card @click="selectAnswer(
         //@ts-ignore
-        question.id, answer.index)"
+        question.id, answer.text)"
         class="d-flex align-center  my-5 pa-0 font-weight-medium"
         v-for="answer in question.answers"
         :key="answer.id"
