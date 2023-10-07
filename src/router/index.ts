@@ -92,6 +92,7 @@ const routes = [
       const local_response = JSON.parse(
         sessionStorage.getItem("response." + to.params.questionnaire_id) || "{}"
       );
+
       const local_questionnaire = JSON.parse(
         sessionStorage.getItem("questionnaire." + to.params.questionnaire_id) ||
           "{}"
@@ -108,6 +109,7 @@ const routes = [
         local_questionnaire.id == to.params.questionnaire_id
       ) {
         questionnaire.value = local_questionnaire;
+
         return next();
       }
 
@@ -132,7 +134,7 @@ const routes = [
             useRespondentStore()
           );
 
-          if(!response.value){
+          if(Object.keys(response.value).length < 1){
             return next()
           }
 
@@ -177,7 +179,6 @@ const routes = [
           const exists = questionnaire.value.questions[to.params.question_id - 1];
 
           if (response.value && response.value.submitted_at) {
-            console.log('triggered success');
 
             return next({
               name: "response.success",
@@ -185,7 +186,7 @@ const routes = [
             });
           }
 
-          if (exists && hasResponseIdentity.value) {
+          if (exists && Object.keys(response.value).length > 0) {
             question.value = exists;
             return next();
           }

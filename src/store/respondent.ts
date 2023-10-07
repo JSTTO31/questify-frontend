@@ -120,6 +120,7 @@ export const useRespondentStore = defineStore('respondent', {
         })
         sessionStorage.removeItem('response.' + this.questionnaire.id)
         sessionStorage.setItem('response.' + this.questionnaire.id, JSON.stringify(response.data))
+
         return response;
       } catch (error) {
         return error

@@ -11,10 +11,7 @@
           <v-btn
             class="text-capitalize"
             color="primary"
-            @click="
-              $router.replace({ name: 'response.question', params: { question_id: 1 } })
-            "
-            :disabled="!first_question"
+            @click="goToQuestion"
             :loading="loading"
             flat
             >continue</v-btn
@@ -23,7 +20,6 @@
           <v-btn
             class="text-capitalize"
             color="blue-darken-1"
-            :disabled="!first_question"
             @click="getStarted"
             :loading="loading"
             flat
@@ -36,22 +32,27 @@
 </template>
 
 <script setup lang="ts">
-import useRespondent from "@/composables/useRespondent";
 import { useRespondentStore } from "@/store/respondent";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 const $respondent = useRespondentStore();
-const { questionnaire, response } = storeToRefs(useRespondentStore());
-const { first_question } = useRespondent();
-const router = useRouter();
+const { questionnaire } = storeToRefs(useRespondentStore());
 const loading = ref(false);
+const router = useRouter();
 const getStarted = () => {
   loading.value = true;
   $respondent.createResponse().then((response) => {
     loading.value = false;
-    router.push({ name: "response.question", params: { question_id: 1 } });
+    goToQuestion();
   });
+};
+const goToQuestion = () => {
+  const routeData = router.resolve({
+    name: "response.question",
+    params: { question_id: 1 },
+  });
+  window.open(routeData.href, "_self");
 };
 </script>
 

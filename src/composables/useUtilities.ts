@@ -47,3 +47,7 @@ export interface PaginationOption{
   "to": number,
   "total": number
 }
+
+export const downloadResult = () => {
+
+}

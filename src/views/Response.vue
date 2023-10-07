@@ -182,9 +182,10 @@ onMounted(() => {
     times_up.value = true;
   }
 
-  if (route.name != "response.index")
+  if (!(route.name == "response.index" || route.name == "response.options")) {
     interval = setInterval(() => {
       clock.value = new Date();
+
       if (timer.value == -1) {
         if (!response.value.submitted_at) {
           $respondent.submitResponse().then(() => {
@@ -198,6 +199,7 @@ onMounted(() => {
         clearInterval(interval);
       }
     }, 1000);
+  }
 });
 
 $respondent.$subscribe(() => {

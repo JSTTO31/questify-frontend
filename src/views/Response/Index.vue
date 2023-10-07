@@ -45,7 +45,11 @@ const getStarted = () => {
   loading.value = true;
   $respondent.createResponse().then((response) => {
     loading.value = false;
-    router.push({ name: "response.question", params: { question_id: 1 } });
+    const routeData = router.resolve({
+      name: "response.question",
+      params: { question_id: 1 },
+    });
+    window.open(routeData.href, "_self");
   });
 };
 </script>
