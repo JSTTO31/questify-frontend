@@ -9,6 +9,8 @@ export interface QuestionResponse{
   question_id: number;
   answer_keys: string[];
   marked: boolean
+  question: Question
+  status: string
   created_at?: string;
   updated_at?: string;
 }
@@ -40,6 +42,35 @@ export const useRespondentStore = defineStore('respondent', {
       try {
         const response = await api.get('/response/questionnaires/' + questionnaire_id)
         this.questionnaire = response.data
+
+        this.questionnaire.questions = this.questionnaire.questions.reduce((arr:Question[], question) => {
+
+          if(question.group){
+            //@ts-ignore
+            const group_exists = arr.find(item => !!item.group_name && item.group_name == question.group)
+
+            if(group_exists){
+              //@ts-ignore
+              group_exists.questions.push(question)
+              return arr
+            }
+
+            arr.push({
+              //@ts-ignore
+              group_name: question.group,
+              index: question.index,
+              questions: [question],
+              marked:false
+            })
+            return arr
+          }
+
+          arr.push(question);
+          return arr
+        },[])
+
+
+
         sessionStorage.setItem('questionnaire.' + questionnaire_id, JSON.stringify(response.data))
         return response;
       } catch (error) {
@@ -62,35 +93,43 @@ export const useRespondentStore = defineStore('respondent', {
         const response = await api.post('/questionnaire/' + this.questionnaire.id + '/responses')
         this.response = response.data
 
-        if(this.response.submitted_at){
-          sessionStorage.setItem('response.' + this.questionnaire.id, JSON.stringify(response.data))
-          window.location.reload()
-          return response;
-        }
-
-
+        // PUSH QUESTIONS
         //@ts-ignore
-        this.response.question_responses = this.questionnaire.questions.map(question => {
-          return {
-            questionnaire_id: this.questionnaire.id,
-            response_id: this.response.id,
-            question_id: question.id,
-            answer_keys: question.answer_keys,
-            marked: false
+        this.response.question_responses = this.questionnaire.questions.filter(item => !item.group_name).map(question => ({
+          questionnaire_id: this.questionnaire.id,
+          response_id: this.response.id,
+          question_id: question.id,
+          answer_keys: [],
+          marked: false
+        }))
+
+        // PUSH GROUP QUESTION
+        //@ts-ignore
+        this.questionnaire.questions.forEach((question) => {
+          //@ts-ignore
+          if(question.group_name){
+            //@ts-ignore
+            this.response.question_responses.push(...question.questions.map((item) => ({
+              questionnaire_id: this.questionnaire.id,
+              response_id: this.response.id,
+              question_id: item.id,
+              answer_keys: [],
+              marked: false
+            })))
           }
         })
-
+        sessionStorage.removeItem('response.' + this.questionnaire.id)
         sessionStorage.setItem('response.' + this.questionnaire.id, JSON.stringify(response.data))
-        window.location.reload()
         return response;
       } catch (error) {
-        console.log(error)
         return error
       }
     },
     async submitResponse(){
       try {
-        const response = await api.post(`responses/${this.response.id}/submit`, {response_questions: this.response.question_responses})
+        const response = await api.post(`responses/${this.response.id}/submit`, {response_questions:
+        //@ts-ignore
+        this.response.question_responses.filter(item => !item.group_name)})
         this.response.submitted_at = (new Date()).toDateString()
         sessionStorage.setItem('response.' + this.questionnaire.id, JSON.stringify(this.response))
 

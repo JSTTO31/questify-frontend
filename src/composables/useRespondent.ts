@@ -72,6 +72,16 @@ export default () => {
     //@ts-ignore
     if(question){
       question.answer_keys.push(answer);
+      sessionStorage.setItem('response.' + response.value.questionnaire_id, JSON.stringify(response.value))
+    }
+  }
+
+  const removeAnswer = (question_id: number, answer: string) => {
+    const question = response.value.question_responses.find(item=> question_id == item.question_id)
+    //@ts-ignore
+    if(question){
+      question.answer_keys = question.answer_keys.filter(item => item != answer)
+      sessionStorage.setItem('response.' + response.value.questionnaire_id, JSON.stringify(response.value))
     }
   }
 
@@ -80,6 +90,8 @@ export default () => {
     //@ts-ignore
     if(question){
       question.answer_keys = []
+      sessionStorage.setItem('response.' + response.value.questionnaire_id, JSON.stringify(response.value))
+
     }
   }
 
@@ -104,5 +116,5 @@ export default () => {
   const isSelected = computed(() => (answer: Answer) => currentAnswer.value.length > 0 && currentAnswer.value.some((item: any) => item == answer.text) ? true : false)
 
 
-  return {links, first_question, last_question, timer, clock, currentIndex, selectAnswer, currentAnswer, currentResponseQuestion, submit, review, loading, clearAnswer, isSelected, showSubmit}
+  return {links, first_question, last_question, timer, clock, currentIndex, selectAnswer, currentAnswer, currentResponseQuestion, submit, review, loading, clearAnswer, isSelected, showSubmit, removeAnswer}
 }

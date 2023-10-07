@@ -182,11 +182,11 @@ export default () => {
     }
   }
 
-  const remove_answer = (question_id: number, answer: Answer) => {
-    const question = questionnaire.value.questions.find(item => item.id == question_id)
+  const remove_answer = (question_index: number, answer: Answer) => {
+    const question = questionnaire.value.questions.find(item => item.index == question_index)
 
     if(question){
-      question.answers = question.answers.filter(item => item.id != answer.id)
+      question.answers = question.answers.filter(item => item.index != answer.index)
       $questionnaire.$patch({
         //@ts-ignore
         trigger: 'remove answer',

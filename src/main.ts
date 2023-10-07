@@ -18,6 +18,7 @@ const app = createApp({
   }
 })
 
+
 registerPlugins(app)
 
 app.mount('#app')

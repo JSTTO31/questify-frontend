@@ -16,9 +16,6 @@ const routes = [
       {
         path: "",
         name: "Home",
-        // route level code-splitting
-        // this generates a separate chunk (about.[hash].js) for this route
-        // which is lazy-loaded when the route is visited.
         component: () =>
           import(/* webpackChunkName: "home" */ "@/views/Home.vue"),
       },
@@ -32,6 +29,8 @@ const routes = [
           const $questionnaire = useQuestionnaireStore();
           return $questionnaire.get(to.params.questionnaire_id).then(() => {
             return next();
+          }).catch((err) => {
+            return next({name: 'NotFound'})
           });
         },
         redirect: { name: "questionnaire.show.summary" },
@@ -41,6 +40,20 @@ const routes = [
             //@ts-ignore
             component: () => import("@/views/Questionnaire/Show/Summary.vue"),
             name: "questionnaire.show.summary",
+          },
+          {
+            path: "analyze-individual",
+            //@ts-ignore
+            component: () => import("@/views/Questionnaire/Show/Individual.vue"),
+            name: "questionnaire.show.individual",
+            //@ts-ignore
+            beforeEnter: (to, from, next) => {
+              const $questionnaire = useQuestionnaireStore()
+
+              return $questionnaire.get_response(to.query.page || 1).then(() => {
+                return next()
+              }).catch(() => next({name: 'questionnaire.show'}))
+            }
           },
           {
             path: "design",
@@ -59,7 +72,7 @@ const routes = [
     ],
   },
   {
-    path: "/login",
+    path: "/AZUWQE13MFA",
     //@ts-ignore
     component: () =>
       import(/* webpackChunkName: "login" */ "@/views/Auth/Login.vue"),
@@ -115,29 +128,36 @@ const routes = [
         name: "response.index",
         //@ts-ignore
         beforeEnter(to, from, next) {
-          const { hasResponseIdentity, questionnaire, response } = storeToRefs(
+          const { response } = storeToRefs(
             useRespondentStore()
           );
 
-          if (hasResponseIdentity && response.value.submitted_at) {
-            return next({
-              name: "response.success",
-              params: { questionnaire_id: questionnaire.value.id },
-            });
+          if(!response.value){
+            return next()
           }
 
-          if (hasResponseIdentity.value) {
-            const question = questionnaire.value.questions[0];
-            return next({
-              name: "response.question",
-              params: {
-                question_id: question.id,
-                questionnaire_id: to.params.questionnaire_id,
-              },
-            });
+          return next({name: 'response.options', params: {questionnaire_id: to.params.questionnaire_id}});
+        },
+        meta: {
+          transition: "scale",
+        },
+      },
+      {
+        path: "",
+        component: () =>
+          import(/* webpackChunkName: "login" */ "@/views/Response/ResponseOptions.vue"),
+        name: "response.options",
+        //@ts-ignore
+        beforeEnter(to, from, next) {
+          const { response } = storeToRefs(
+            useRespondentStore()
+          );
+
+          if(response.value){
+            return next()
           }
 
-          return next();
+          return next({name: 'response.index', params: {questionnaire_id: to.params.questionnaire_id}});
         },
         meta: {
           transition: "scale",
@@ -153,18 +173,11 @@ const routes = [
         name: "response.question",
         //@ts-ignore
         beforeEnter(to, from, next) {
-          const { questionnaire, question, hasResponseIdentity, response } =
-            storeToRefs(useRespondentStore());
-          const exists = questionnaire.value.questions.find(
-            (question) => question.id == to.params.question_id
-          );
-
-
-            console.log(response.value);
-
+          const { questionnaire, question, hasResponseIdentity, response } = storeToRefs(useRespondentStore());
+          const exists = questionnaire.value.questions[to.params.question_id - 1];
 
           if (response.value && response.value.submitted_at) {
-            console.log("triggered");
+            console.log('triggered success');
 
             return next({
               name: "response.success",
@@ -271,6 +284,12 @@ const routes = [
       },
     ],
   },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    //@ts-ignore
+    component: () => import('@/views/utility/NotFound.vue'),
+  }
 ];
 
 const router = createRouter({

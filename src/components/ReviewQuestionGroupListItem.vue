@@ -17,29 +17,15 @@ import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
 const {response, questionnaire} = storeToRefs(useRespondentStore())
 const question_response = response.value.question_responses.find(item => item.question_id == props.question.id)
-const props = defineProps<{question: Question, index: number}>()
-const isPending = computed(() => {
-  //@ts-ignore
-  if(props.question.group_name){
-    //@ts-ignore
-    return props.question.questions.every((item: any) => {
-      const exists = response.value.question_responses.find(innerItem => innerItem.question_id == item.id)
-      if(!exists){
-        return false
-      }
-
-      return exists.answer_keys.length < 1
-    })
-  }
-
-  //@ts-ignore
-  return question_response.answer_keys.length < 1
-})
+const props = defineProps<{question: {group_name: string, questions: Question[]}, index: number}>()
 //@ts-ignore
-const icon = question_response?.marked ? 'mdi-lightbulb' : isPending.value ? 'mdi-reload' : 'mdi-check'
+const icon = question_response?.marked ? 'mdi-lightbulb' : question_response.answer_keys.length < 1 ? 'mdi-reload' : 'mdi-check'
 //@ts-ignore
-const color = question_response?.marked ? 'warning' : isPending.value? 'grey' : 'success'
+const color = question_response?.marked ? 'warning' : question_response.answer_keys.length < 1? 'grey' : 'success'
 const currentIndex = computed(() => questionnaire.value.questions.findIndex(item => item.id == question_response?.question_id))
+
+
+
 
 </script>
 

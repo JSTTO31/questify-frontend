@@ -29,6 +29,23 @@ export const useUserStore = defineStore('user', {
           location.href = 'http://localhost:3000/'
         })
       });
+    },
+    logout(){
+      return api.post('/logout').then(() => {
+        localStorage.removeItem('user')
+        window.location.reload()
+      })
+    },
+    async change_password(data: {
+      old_password: string, password: string, password_confirmation: string
+    }){
+      try {
+        const response = await api.post('/change-password', {...data})
+
+        return response
+      } catch (error) {
+        return Promise.reject(error)
+      }
     }
   }
 })

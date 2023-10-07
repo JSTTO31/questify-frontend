@@ -25,3 +25,25 @@ api.interceptors.response.use((response) => {
   }
   return Promise.reject(error)
 })
+
+export interface links{
+  url: null | string,
+  label: string;
+  active: boolean
+}
+
+
+export interface PaginationOption{
+  "current_page": number,
+  "first_page_url": string,
+  "from": number,
+  "last_page": number,
+  "last_page_url": string,
+  "links": links[];
+  "next_page_url": string
+  "path": string,
+  "per_page": number,
+  "prev_page_url": string,
+  "to": number,
+  "total": number
+}

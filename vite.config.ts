@@ -23,6 +23,7 @@ export default defineConfig({
   define: { 'process.env': {
     local_url: 'localhost:3000',
     private_url: 'http://192.168.100.67:3000',
+    login_url: 'localhost:3000/AZUWQE13MFA',
   } },
   resolve: {
     alias: {
