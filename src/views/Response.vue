@@ -1,19 +1,36 @@
 <template>
   <v-app>
-    <!-- <v-navigation-drawer  :model-value="showQuestionList && $route.name == 'response.question'" width="300">
-      <v-card class="h-100 w-100" style="z-index: 55000;overflow-y: auto;">
+    <v-navigation-drawer
+      :model-value="showQuestionList && $route.name == 'response.question'"
+      width="300"
+    >
+      <v-card class="h-100 w-100" style="z-index: 55000; overflow-y: auto">
         <v-card-title class="d-flex align-center">
           Question List
           <v-spacer></v-spacer>
           <v-btn icon="mdi-close" size="small" @click="showQuestionList = false"></v-btn>
         </v-card-title>
         <v-list>
-          <v-list-item :active="$question.id == question.id" color="primary" style="user-select: none;" @click="$router.push({name: 'response.question', params: {question_id: $question.id}})" v-for="$question, n in questionnaire.questions" :key="$question.id" >
-            <v-card-title class="font-weight-regular text-subtitle-2 pa-0" >{{n + 1}}. {{ $question.text }}</v-card-title>
+          <v-list-item
+            :active="$question.id == question.id"
+            color="primary"
+            style="user-select: none"
+            @click="
+              $router.push({
+                name: 'response.question',
+                params: { question_id: $question.id },
+              })
+            "
+            v-for="($question, n) in questionnaire.questions"
+            :key="$question.id"
+          >
+            <v-card-title class="font-weight-regular text-subtitle-2 pa-0"
+              >{{ n + 1 }}. {{ $question.text }}</v-card-title
+            >
           </v-list-item>
         </v-list>
       </v-card>
-    </v-navigation-drawer> -->
+    </v-navigation-drawer>
     <v-app-bar
       height="35"
       flat

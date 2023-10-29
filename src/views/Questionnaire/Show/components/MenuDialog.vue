@@ -29,26 +29,14 @@
         <v-list-item
           append-icon="mdi-group"
           class="font-weight-regular"
-          @click="
-            update_question(
-              //@ts-ignore
-              firstSelected.index,
-              { ...firstSelected, group: group_name }
-            )
-          "
+          @click="update_question({ ...firstSelected, group: group_name })"
           :disabled="firstSelected && !!firstSelected.group"
           >Group</v-list-item
         >
         <v-list-item
           append-icon="mdi-ungroup"
           class="font-weight-regular"
-          @click="
-            update_question(
-              //@ts-ignore
-              firstSelected.index,
-              { ...firstSelected, group: '' }
-            )
-          "
+          @click="update_question({ ...firstSelected, group: '' })"
           :disabled="firstSelected && !firstSelected.group"
           >Ungroup</v-list-item
         >
@@ -179,13 +167,10 @@ const group_name = computed(() => {
     .filter((item) => item.group)
     //@ts-ignore
     .sort((a, b) => b.group?.localeCompare(a.group))[0];
-  console.log(hasUntitled);
 
   if (hasUntitled) {
     //@ts-ignore
     const number = hasUntitled.group?.match(/[0-9]/gi);
-
-    console.log(number, hasUntitled.group);
 
     //@ts-ignore
     return "Untitled group " + (number == undefined ? 1 : parseInt(number[0]) + 1);

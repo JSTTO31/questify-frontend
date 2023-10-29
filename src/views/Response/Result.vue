@@ -90,6 +90,7 @@
 </template>
 
 <script setup lang="ts">
+import { getPdfBytesResults } from "@/composables/useUtilities";
 import CurrentGroupResponseQuestionlistContainer from "./components/CurrentGroupResponseQuestionlistContainer.vue";
 import CurrentResponseQuestionList from "./components/CurrentResponseQuestionList.vue";
 import Footer from "./components/Footer.vue";
@@ -131,12 +132,7 @@ const getScores = computed(() =>
   questionnaire.value.questions.reduce((sum, question) => (sum += getScore(question)), 0)
 );
 
-const getNumberOfPoints = computed(() =>
-  answer_keys.value.reduce(
-    (sum, question) => (sum += (question.answer_keys?.length || 0) * question.points),
-    0
-  )
-);
+const getNumberOfPoints = computed(() => questionnaire.value.questions.length);
 
 const getScorePercentage = computed(() => {
   return (getScores.value / getNumberOfPoints.value) * 100 || 0;
@@ -164,19 +160,27 @@ onBeforeRouteLeave((to, from, next) => {
 
 $response.getAnwerKeys(response.value.questionnaire_id);
 
-const download = () => {
+const download = async () => {
   const link = document.getElementById("download");
 
   if (link) {
     //@ts-ignore
-    const file = new Blob(response.value.question_responses, { type: "application/xls" });
+    link.href = await getPdfBytesResults(
+      questionnaire.value,
+      answer_keys.value,
+      response.value,
+      getScores.value,
+      getNumberOfPoints.value
+    );
     //@ts-ignore
-    link.href = URL.createObjectURL(file);
-    //@ts-ignore
-    link.download = "sample.xls";
+    link.download = "result.pdf";
     link.click();
-    //@ts-ignore
-    URL.revokeObjectURL(link.href);
+    // location.href = await getPdfBytesResults(
+    //   questionnaire.value,
+    //   response.value,
+    //   getScores.value,
+    //   getNumberOfPoints.value
+    // );
   }
 };
 

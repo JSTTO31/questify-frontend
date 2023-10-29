@@ -1,6 +1,7 @@
 <template>
   <v-card class="pa-5 mb-2">
     <v-textarea
+      draggable="false"
       auto-grow
       rows="1"
       hide-details

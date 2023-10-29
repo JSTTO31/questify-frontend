@@ -1,7 +1,9 @@
+import { Question, Questionnaire } from '@/store/questionnaire'
+import { Response } from '@/store/respondent'
 import axios from 'axios'
-
+import Result from './classes/QuestionnaireResult'
 export const api = axios.create({
-  baseURL: 'http://localhost:8000/api',
+  baseURL: process.env.backend_api_url + '/api',
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json'
@@ -48,6 +50,14 @@ export interface PaginationOption{
   "total": number
 }
 
-export const downloadResult = () => {
 
+export const getPdfBytesResults = async (questionnaire: Questionnaire, questions: Question[], respondent: Response, score = 0, numberOfPoints = 0) => {
+
+  const result = new Result(questionnaire, questions, respondent, score, numberOfPoints)
+
+  await result.configure()
+  result.process()
+
+
+  return  await result.save()
 }

@@ -83,7 +83,7 @@ const routes = [
     name: "responses",
     //@ts-ignore
     component: () =>
-      import(/* webpackChunkName: "login" */ "@/views/Response.vue"),
+      import(/* webpackChunkName: "response" */ "@/views/Response.vue"),
     redirect: { name: "response.index" },
     //@ts-ignore
     beforeEnter(to, from, next) {
@@ -126,11 +126,11 @@ const routes = [
       {
         path: "",
         component: () =>
-          import(/* webpackChunkName: "login" */ "@/views/Response/Index.vue"),
+          import(/* webpackChunkName: "response.index" */ "@/views/Response/Index.vue"),
         name: "response.index",
         //@ts-ignore
         beforeEnter(to, from, next) {
-          const { response } = storeToRefs(
+          const { response, questionnaire } = storeToRefs(
             useRespondentStore()
           );
 
@@ -138,28 +138,7 @@ const routes = [
             return next()
           }
 
-          return next({name: 'response.options', params: {questionnaire_id: to.params.questionnaire_id}});
-        },
-        meta: {
-          transition: "scale",
-        },
-      },
-      {
-        path: "",
-        component: () =>
-          import(/* webpackChunkName: "login" */ "@/views/Response/ResponseOptions.vue"),
-        name: "response.options",
-        //@ts-ignore
-        beforeEnter(to, from, next) {
-          const { response } = storeToRefs(
-            useRespondentStore()
-          );
-
-          if(response.value){
-            return next()
-          }
-
-          return next({name: 'response.index', params: {questionnaire_id: to.params.questionnaire_id}});
+          return next({name: 'response.question', params: {questionnaire_id: questionnaire.value.id, question_id: questionnaire.value.questions[questionnaire.value.questions.length - 1].id}});
         },
         meta: {
           transition: "scale",
@@ -271,13 +250,7 @@ const routes = [
             useRespondentStore()
           );
 
-          if (response.value && response.value.submitted_at && times_up.value) {
-            return next();
-          }
-          return next({
-            name: "response.index",
-            params: { questionnaire_id: questionnaire.value.id },
-          });
+          return next()
         },
         meta: {
           transition: "scale",
@@ -308,7 +281,7 @@ router.beforeEach((to, from, next) => {
 
   nprogress.start();
   if (to.meta.requiresAuth && Object.keys(userData).length < 1) {
-    return next({ name: "Login" });
+    return next({ name: "NotFound" });
   }
 
   return next();

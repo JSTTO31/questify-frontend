@@ -14,23 +14,14 @@
             support you every step of the way.
           </p>
           <p>Keep up the great work, and best of luck with your studies!</p>
-          <v-alert type="info" variant="tonal" class="my-5">
+          <!-- <v-alert type="info" variant="tonal" class="my-5">
             Please note that you'll need to wait for other participants to complete the
             questionnaire before we can provide you with the results.
-          </v-alert>
-          <v-btn
-            disabled
-            class="font-weight-bold px-5"
-            prepend-icon="mdi-clock"
-            width="150"
-            v-if="timer != -1"
-            >Result {{ timer }}</v-btn
-          >
+          </v-alert> -->
           <v-btn
             color="primary"
-            class="font-weight-bold"
+            class="mt-5 font-weight-bold"
             width="150"
-            v-else
             @click="$router.push({ name: 'response.result' })"
             >See Result</v-btn
           >

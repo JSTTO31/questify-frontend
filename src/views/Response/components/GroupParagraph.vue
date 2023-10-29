@@ -1,16 +1,20 @@
 <template>
   <v-card class="pa-5">
-    <h3>{{ question.text }}</h3>
-    <VRadioGroup class="pa-0 mt-5" v-model="selected" @update:model-value="select">
-      <v-radio
-        color="primary"
-        class="px-0"
-        :label="answer.text"
-        :value="answer.text"
-        v-for="answer in question.answers"
-        :key="answer.id"
-      ></v-radio>
-    </VRadioGroup>
+    <h3>
+      {{ question.text }}
+    </h3>
+    <v-textarea
+      color="primary"
+      class="mb-10"
+      density="compact"
+      label="Select answer"
+      hide-details
+      variant="outlined"
+      single-line
+      :model-value="text"
+      @change="($event: any) => select($event.target.value)"
+      rows="4"
+    ></v-textarea>
   </v-card>
 </template>
 
@@ -18,21 +22,23 @@
 import { Question } from "@/store/questionnaire";
 import { storeToRefs } from "pinia";
 import { useRespondentStore } from "@/store/respondent";
-import { ref } from "vue";
 import useRespondent from "@/composables/useRespondent";
 import { computed } from "vue";
+import { ref, watch } from "vue";
 const props = defineProps<{ question: Question }>();
 const { response } = storeToRefs(useRespondentStore());
 const { selectAnswer, clearAnswer } = useRespondent();
 const currentAnswer = computed(() =>
   response.value.question_responses.find((item) => item.question_id == props.question.id)
 );
-const selected = ref(currentAnswer.value?.answer_keys[0] || "");
-const select = () => {
+const text = ref(currentAnswer.value?.answer_keys[0] || null);
+const select = (value: string) => {
   //@ts-ignore
   clearAnswer(props.question.id);
-  //@ts-ignore
-  selectAnswer(props.question.id, selected.value);
+  if (value) {
+    //@ts-ignore
+    selectAnswer(props.question.id, value);
+  }
 };
 </script>
 

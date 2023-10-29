@@ -108,7 +108,7 @@ const drop = (e: Event, group_name: string) => {
     if (props.selectedMenuDialog.length > 0) {
       group_questions(props.selectedMenuDialog, props.question.group_name);
     } else {
-      update_question(index, { ...question, group: group_name });
+      update_question({ ...question, group: group_name });
     }
   }
 
@@ -138,7 +138,6 @@ const click = (e: Event, question: Question) => {
     const isSelected = props.selectedMenuDialog.some(
       (item) => item.index == question.index
     );
-    console.log(isSelected);
 
     if (isSelected) {
       const selected = props.selectedMenuDialog
@@ -155,6 +154,8 @@ const click = (e: Event, question: Question) => {
     selectedQuestion.value = question;
     emits("update:selectedMenuDialog", []);
   }
+
+  // router.push({ query: { questiondx: props.question.index } });
 };
 
 watch(
