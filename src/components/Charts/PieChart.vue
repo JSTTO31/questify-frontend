@@ -33,7 +33,7 @@ const data = computed(() => ({
   ],
 }));
 
-const options = {
+const options: any = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {

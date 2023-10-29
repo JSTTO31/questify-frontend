@@ -83,7 +83,7 @@ const routes = [
     name: "responses",
     //@ts-ignore
     component: () =>
-      import(/* webpackChunkName: "login" */ "@/views/Response.vue"),
+      import(/* webpackChunkName: "response" */ "@/views/Response.vue"),
     redirect: { name: "response.index" },
     //@ts-ignore
     beforeEnter(to, from, next) {
@@ -92,6 +92,7 @@ const routes = [
       const local_response = JSON.parse(
         sessionStorage.getItem("response." + to.params.questionnaire_id) || "{}"
       );
+
       const local_questionnaire = JSON.parse(
         sessionStorage.getItem("questionnaire." + to.params.questionnaire_id) ||
           "{}"
@@ -108,6 +109,7 @@ const routes = [
         local_questionnaire.id == to.params.questionnaire_id
       ) {
         questionnaire.value = local_questionnaire;
+
         return next();
       }
 
@@ -124,40 +126,19 @@ const routes = [
       {
         path: "",
         component: () =>
-          import(/* webpackChunkName: "login" */ "@/views/Response/Index.vue"),
+          import(/* webpackChunkName: "response.index" */ "@/views/Response/Index.vue"),
         name: "response.index",
         //@ts-ignore
         beforeEnter(to, from, next) {
-          const { response } = storeToRefs(
+          const { response, questionnaire } = storeToRefs(
             useRespondentStore()
           );
 
-          if(!response.value){
+          if(Object.keys(response.value).length < 1){
             return next()
           }
 
-          return next({name: 'response.options', params: {questionnaire_id: to.params.questionnaire_id}});
-        },
-        meta: {
-          transition: "scale",
-        },
-      },
-      {
-        path: "",
-        component: () =>
-          import(/* webpackChunkName: "login" */ "@/views/Response/ResponseOptions.vue"),
-        name: "response.options",
-        //@ts-ignore
-        beforeEnter(to, from, next) {
-          const { response } = storeToRefs(
-            useRespondentStore()
-          );
-
-          if(response.value){
-            return next()
-          }
-
-          return next({name: 'response.index', params: {questionnaire_id: to.params.questionnaire_id}});
+          return next({name: 'response.question', params: {questionnaire_id: questionnaire.value.id, question_id: questionnaire.value.questions[questionnaire.value.questions.length - 1].id}});
         },
         meta: {
           transition: "scale",
@@ -177,7 +158,6 @@ const routes = [
           const exists = questionnaire.value.questions[to.params.question_id - 1];
 
           if (response.value && response.value.submitted_at) {
-            console.log('triggered success');
 
             return next({
               name: "response.success",
@@ -185,7 +165,7 @@ const routes = [
             });
           }
 
-          if (exists && hasResponseIdentity.value) {
+          if (exists && Object.keys(response.value).length > 0) {
             question.value = exists;
             return next();
           }
@@ -270,13 +250,7 @@ const routes = [
             useRespondentStore()
           );
 
-          if (response.value && response.value.submitted_at && times_up.value) {
-            return next();
-          }
-          return next({
-            name: "response.index",
-            params: { questionnaire_id: questionnaire.value.id },
-          });
+          return next()
         },
         meta: {
           transition: "scale",
@@ -307,7 +281,7 @@ router.beforeEach((to, from, next) => {
 
   nprogress.start();
   if (to.meta.requiresAuth && Object.keys(userData).length < 1) {
-    return next({ name: "Login" });
+    return next({ name: "NotFound" });
   }
 
   return next();

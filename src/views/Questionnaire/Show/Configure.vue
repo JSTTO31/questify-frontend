@@ -71,14 +71,14 @@ import { watch } from "vue";
 const $questionnaire = useQuestionnaireStore();
 const { questionnaire } = storeToRefs(useQuestionnaireStore());
 let timer: any = null;
-onMounted(() => {
-  watch(questionnaire.value, () => {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      console.log("triggered");
-      $questionnaire.update(questionnaire.value);
-    }, 1000);
-  });
+watch(questionnaire.value, () => {
+  console.log("triggered");
+
+  clearTimeout(timer);
+  timer = setTimeout(() => {
+    localStorage.setItem("questionnaire", JSON.stringify(questionnaire));
+    $questionnaire.update(questionnaire.value);
+  }, 500);
 });
 </script>
 

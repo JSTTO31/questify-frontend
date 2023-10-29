@@ -18,17 +18,20 @@
         @click="next"
       ></v-btn>
     </v-card>
-    <IndividualCard
-      class="rounded-lg pa-5 my-2"
-      v-for="
-        //@ts-ignore
-        response_question, index in respondent.response_questions"
-      :key="response_question.id"
-      :response_question="response_question"
-      :index="index"
-    >
-      {{ response_question }}
-    </IndividualCard>
+
+    <div v-if="respondent.submitted_at">
+      <IndividualCard
+        class="rounded-lg pa-5 my-2"
+        v-for="
+          //@ts-ignore
+          response_question, index in respondent.response_questions.filter(item => !!item.question)"
+        :key="response_question.id"
+        :response_question="response_question"
+        :index="index"
+      >
+        {{ response_question }}
+      </IndividualCard>
+    </div>
     <v-card class="my-2 rounded-lg pa-5 d-flex align-center">
       <h3>IP Address: {{ respondent.ip_address }}</h3>
       <v-spacer></v-spacer>

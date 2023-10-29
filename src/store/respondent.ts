@@ -41,6 +41,8 @@ export const useRespondentStore = defineStore('respondent', {
     async getQuestionnaire(questionnaire_id: number){
       try {
         const response = await api.get('/response/questionnaires/' + questionnaire_id)
+        console.log(response.data);
+
         this.questionnaire = response.data
 
         this.questionnaire.questions = this.questionnaire.questions.reduce((arr:Question[], question) => {
@@ -68,8 +70,6 @@ export const useRespondentStore = defineStore('respondent', {
           arr.push(question);
           return arr
         },[])
-
-
 
         sessionStorage.setItem('questionnaire.' + questionnaire_id, JSON.stringify(response.data))
         return response;
@@ -120,6 +120,7 @@ export const useRespondentStore = defineStore('respondent', {
         })
         sessionStorage.removeItem('response.' + this.questionnaire.id)
         sessionStorage.setItem('response.' + this.questionnaire.id, JSON.stringify(response.data))
+
         return response;
       } catch (error) {
         return error
